@@ -1,9 +1,13 @@
 import { colors, fontsize } from '@/constants/token'
 import { BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
+import { Book, CircleUser, Heart, Music } from 'lucide-react-native'
 import { StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const TabsNavigation = () => {
+	const insets = useSafeAreaInsets()
+
 	return (
 		<Tabs
 			screenOptions={{
@@ -19,6 +23,8 @@ const TabsNavigation = () => {
 					borderTopRightRadius: 20,
 					borderTopWidth: 0,
 					paddingTop: 8,
+					paddingBottom: insets.bottom + 7,
+					height: insets.bottom + 70,
 				},
 				tabBarBackground: () => (
 					<BlurView
@@ -33,10 +39,34 @@ const TabsNavigation = () => {
 				),
 			}}
 		>
-			<Tabs.Screen name="favorites" />
-			<Tabs.Screen name="playlists" />
-			<Tabs.Screen name="(songs)" />
-			<Tabs.Screen name="artists" />
+			<Tabs.Screen
+				name="favorites"
+				options={{
+					title: 'Favorites',
+					tabBarIcon: ({ color }) => <Heart size={20} color={color} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="playlists"
+				options={{
+					title: 'Playlists',
+					tabBarIcon: ({ color }) => <Book size={20} color={color} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="(songs)"
+				options={{
+					title: 'Songs',
+					tabBarIcon: ({ color }) => <Music size={20} color={color} />,
+				}}
+			/>
+			<Tabs.Screen
+				name="artists"
+				options={{
+					title: 'Artists',
+					tabBarIcon: ({ color }) => <CircleUser size={20} color={color} />,
+				}}
+			/>
 		</Tabs>
 	)
 }
