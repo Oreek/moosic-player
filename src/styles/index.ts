@@ -10,6 +10,11 @@ export const defaultStyle = StyleSheet.create({
 		fontSize: fontsize.base,
 		color: colors.text,
 	},
+	ItemSeparator: {
+		borderColor: colors.textMuted,
+		borderWidth: StyleSheet.hairlineWidth,
+		opacity: 0.3,
+	},
 })
 
 export const utilStyles = StyleSheet.create({})

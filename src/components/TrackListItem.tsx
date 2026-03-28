@@ -14,40 +14,33 @@ export const TrackListItem = ({ track }: TrackListItenProps) => {
 	return (
 		<TouchableHighlight>
 			<View style={styles.trackItemContainer}>
-				<View>
-					<View>
-						<FastImage
-							source={{
-								uri: track.image ?? unknownTrackImgUrl,
-								priority: FastImage.priority.normal,
-							}}
-							style={{
-								...styles.trackArtworkImg,
-								opacity: isActiveTrack ? 0.6 : 1,
-							}}
-						/>
-					</View>
-					<View
+				<FastImage
+					source={{
+						uri: track.image ?? unknownTrackImgUrl,
+						priority: FastImage.priority.normal,
+					}}
+					style={{
+						...styles.trackArtworkImg,
+						opacity: isActiveTrack ? 0.6 : 1,
+					}}
+				/>
+
+				<View style={styles.textContainer}>
+					<Text
+						numberOfLines={1}
 						style={{
-							width: '100%',
+							...styles.trackTitleText,
+							color: isActiveTrack ? colors.primary : colors.text,
 						}}
 					>
-						<Text
-							numberOfLines={1}
-							style={{
-								...styles.trackTitleText,
-								color: isActiveTrack ? colors.primary : colors.text,
-							}}
-						>
-							{track.title}
-						</Text>
+						{track.title}
+					</Text>
 
-						{track.artist && (
-							<Text numberOfLines={1} style={styles.trackArtistText}>
-								{track.artist}
-							</Text>
-						)}
-					</View>
+					{track.artist && (
+						<Text numberOfLines={1} style={styles.trackArtistText}>
+							{track.artist}
+						</Text>
+					)}
 				</View>
 			</View>
 		</TouchableHighlight>
@@ -59,12 +52,13 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		width: 50,
 		height: 50,
+		marginRight: 12,
 	},
 	trackTitleText: {
 		...defaultStyle.text,
 		fontSize: fontsize.sm,
 		fontWeight: '600',
-		maxWidth: '90%',
+		// maxWidth: '90%',
 	},
 	trackArtistText: {
 		...defaultStyle.text,
@@ -74,8 +68,11 @@ const styles = StyleSheet.create({
 	},
 	trackItemContainer: {
 		flexDirection: 'row',
-		columnGap: 14,
 		alignItems: 'center',
-		paddingRight: 20,
+		paddingVertical: 10,
+		paddingHorizontal: 16,
+	},
+	textContainer: {
+		flex: 1,
 	},
 })
