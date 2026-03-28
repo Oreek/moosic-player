@@ -19,6 +19,7 @@
 		"expo-constants": "~55.0.9",
 		"expo-dev-client": "~55.0.19",
 		"expo-linking": "~55.0.9",
+		"expo-media-library": "~55.0.10",
 		"expo-router": "~55.0.8",
 		"expo-status-bar": "~55.0.4",
 		"lucide-react-native": "^1.7.0",
