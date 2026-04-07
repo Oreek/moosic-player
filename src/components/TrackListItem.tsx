@@ -1,27 +1,26 @@
 import { unknownTrackImgUrl } from '@/constants/images'
 import { colors, fontsize } from '@/constants/token'
 import { defaultStyle } from '@/styles'
-import FastImage from '@d11/react-native-fast-image'
-import { StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { ChevronRight } from 'lucide-react-native'
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
 
 export type TrackListItenProps = {
 	track: { title: string; image?: string; artist?: string }
+	isActive?: boolean
+	onPress?: () => void
 }
 
-export const TrackListItem = ({ track }: TrackListItenProps) => {
-	const isActiveTrack = false
-
+export const TrackListItem = ({ track, isActive = false, onPress }: TrackListItenProps) => {
 	return (
-		<TouchableHighlight>
+		<TouchableHighlight onPress={onPress} underlayColor={colors.background}>
 			<View style={styles.trackItemContainer}>
-				<FastImage
+				<Image
 					source={{
 						uri: track.image ?? unknownTrackImgUrl,
-						priority: FastImage.priority.normal,
 					}}
 					style={{
 						...styles.trackArtworkImg,
-						opacity: isActiveTrack ? 0.6 : 1,
+						opacity: isActive ? 0.6 : 1,
 					}}
 				/>
 
@@ -30,7 +29,7 @@ export const TrackListItem = ({ track }: TrackListItenProps) => {
 						numberOfLines={1}
 						style={{
 							...styles.trackTitleText,
-							color: isActiveTrack ? colors.primary : colors.text,
+							color: isActive ? colors.primary : colors.text,
 						}}
 					>
 						{track.title}
@@ -42,6 +41,12 @@ export const TrackListItem = ({ track }: TrackListItenProps) => {
 						</Text>
 					)}
 				</View>
+
+				<ChevronRight
+					size={20}
+					color={isActive ? colors.primary : colors.textMuted}
+					style={{ opacity: isActive ? 1 : 0.6 }}
+				/>
 			</View>
 		</TouchableHighlight>
 	)

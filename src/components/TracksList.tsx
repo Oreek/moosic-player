@@ -1,9 +1,11 @@
+import { useAudioPlayer, type AudioTrack } from '@/hooks/useAudioPlayer'
 import { defaultStyle } from '@/styles'
+import { useRouter } from 'expo-router'
 import { FlatList, FlatListProps, View } from 'react-native'
 import { TrackListItem } from './TrackListItem'
 
-export type TracksListProps = Partial<FlatListProps<unknown>> & {
-	tracks: any[]
+export type TracksListProps = Partial<FlatListProps<AudioTrack>> & {
+	tracks: AudioTrack[]
 }
 
 const ItemDivider = () => (
@@ -11,6 +13,9 @@ const ItemDivider = () => (
 )
 
 export const TracksList = ({ tracks, ...flatlistProps }: TracksListProps) => {
+	const router = useRouter()
+	const { currentTrack, playTrack } = useAudioPlayer()
+
 	return (
 		<FlatList
 			data={tracks}
@@ -19,6 +24,11 @@ export const TracksList = ({ tracks, ...flatlistProps }: TracksListProps) => {
 					track={{
 						...track,
 						image: track.artwork,
+					}}
+					isActive={currentTrack?.url === track.url}
+					onPress={() => {
+						playTrack(track, { queue: tracks })
+						router.push('/player')
 					}}
 				/>
 			)}
