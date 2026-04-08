@@ -1,3 +1,4 @@
+import { MiniPlayer } from '@/components/MiniPlayer'
 import { colors, fontsize } from '@/constants/token'
 import { BlurTargetView, BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
@@ -9,9 +10,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 const TabsNavigation = () => {
 	const insets = useSafeAreaInsets()
 	const blurRef = useRef<View | null>(null)
+	const tabBarHeight = insets.bottom + 70
 
 	return (
 		<BlurTargetView ref={blurRef} style={{ flex: 1 }}>
+			<MiniPlayer bottomOffset={tabBarHeight + 4} />
 			<Tabs
 				screenOptions={{
 					tabBarActiveTintColor: colors.primary,
