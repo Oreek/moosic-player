@@ -1,8 +1,16 @@
 import { TracksList } from '@/components/TracksList'
+import { colors } from '@/constants/token'
 import { useLocalTracks } from '@/hooks/useLocalTracks'
 import { useNavSearch } from '@/hooks/useNavigationSearch'
 import { defaultStyle } from '@/styles'
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
+import {
+	ActivityIndicator,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native'
 
 const SongScreen = () => {
 	const search = useNavSearch({
@@ -12,7 +20,7 @@ const SongScreen = () => {
 		},
 	})
 
-	const { tracks, loading, statusMessage } = useLocalTracks(search)
+	const { tracks, loading, statusMessage, addFolder, cleanFolders } = useLocalTracks(search)
 	// const filteredSongs = useMemo(() => {
 	// 	if (!search) return library
 
@@ -29,15 +37,24 @@ const SongScreen = () => {
 
 	return (
 		<View style={defaultStyle.container}>
+			<View style={styles.actionContainer}>
+				<TouchableOpacity style={[styles.button, styles.addButton]} onPress={addFolder}>
+					<Text style={styles.buttonText}>Add Folder</Text>
+				</TouchableOpacity>
+				<TouchableOpacity style={[styles.button, styles.clearButton]} onPress={cleanFolders}>
+					<Text style={styles.buttonText}>Clear Folders</Text>
+				</TouchableOpacity>
+			</View>
+
 			{loading ? (
 				<View style={{ padding: 16 }}>
-					<ActivityIndicator />
-					<Text style={{ marginTop: 8 }}>{statusMessage}</Text>
+					<ActivityIndicator size="large" />
+					<Text style={{ marginTop: 8, textAlign: 'center' }}>{statusMessage}</Text>
 				</View>
 			) : (
 				<ScrollView contentInsetAdjustmentBehavior="automatic">
-					<View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-						<Text>{statusMessage}</Text>
+					<View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
+						<Text style={{ textAlign: 'center', opacity: 0.6 }}>{statusMessage}</Text>
 					</View>
 					<TracksList tracks={tracks} scrollEnabled={false} />
 				</ScrollView>
@@ -47,3 +64,39 @@ const SongScreen = () => {
 }
 
 export default SongScreen
+
+const styles = StyleSheet.create({
+	actionContainer: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		paddingHorizontal: 16,
+		paddingTop: 16,
+		paddingBottom: 8,
+		gap: 12,
+	},
+	button: {
+		paddingVertical: 10,
+		paddingHorizontal: 20,
+		borderRadius: 24,
+		minWidth: 120,
+		alignItems: 'center',
+	},
+	addButton: {
+		backgroundColor: colors.primary,
+		elevation: 2,
+		shadowColor: '#000',
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+	},
+	clearButton: {
+		backgroundColor: 'rgba(255, 255, 255, 0.1)',
+		borderWidth: 1,
+		borderColor: 'rgba(255, 255, 255, 0.3)',
+	},
+	buttonText: {
+		color: 'white',
+		fontWeight: '600',
+		fontSize: 14,
+	},
+})

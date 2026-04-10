@@ -1,7 +1,9 @@
-import library from '@/assets/data/library.json'
 import { trackTitleFilter } from '@/helpers/filter'
-import MediaLibrary from 'expo-media-library'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as FileSystem from 'expo-file-system/legacy'
 import { useEffect, useMemo, useState } from 'react'
+
+const { StorageAccessFramework } = FileSystem
 
 export type LocalTrack = {
 	url: string
@@ -12,7 +14,9 @@ export type LocalTrack = {
 	playlist?: string[]
 }
 
-const AUDIO_PAGE_SIZE = 500
+// const AUDIO_PAGE_SIZE = 500
+
+const DIRS_STORAGE_KEY = 'moosic_player_dirs'
 
 function filenameToTitle(filename?: string) {
 	if (!filename) return 'Unknown Title'
@@ -22,80 +26,126 @@ function filenameToTitle(filename?: string) {
 export function useLocalTracks(search: string) {
 	const [tracks, setTracks] = useState<LocalTrack[]>([])
 	const [loading, setLoading] = useState(true)
-	const [statusMessage, setStatusMessage] = useState('Loading songs...')
+	const [statusMessage, setStatusMessage] = useState('Initializing...')
 	const [permissionDenied, setPermissionDenied] = useState(false)
 
-	useEffect(() => {
-		let active = true
+	const crawlDirectory = async (dirUri: string, depth = 0): Promise<string[]> => {
+		const audioFiles: string[] = []
+		if (depth > 4) return audioFiles
 
-		async function load() {
+		try {
+			const files = await StorageAccessFramework.readDirectoryAsync(dirUri)
+			for (const fileUri of files) {
+				if (fileUri.match(/\.(mp3|flac|wav)$/i)) {
+					audioFiles.push(fileUri)
+				} else {
+					const info = await FileSystem.getInfoAsync(fileUri)
+					if (info.isDirectory) {
+						const subFiles = await crawlDirectory(fileUri, depth + 1)
+						audioFiles.push(...subFiles)
+					}
+				}
+			}
+		} catch (e) {
+			console.log('Error crawling directory URI:', dirUri, e)
+		}
+		return audioFiles
+	}
+
+	const loadDirectories = async () => {
+		try {
 			setLoading(true)
-			setStatusMessage('requesting media permission')
+			setStatusMessage('Loading saved folders...')
 			setPermissionDenied(false)
 
-			try {
-				const permission = await MediaLibrary.requestPermissionsAsync()
-				if (!active) return
-				if (!permission.granted) {
-					setPermissionDenied(true)
-					setTracks(library as LocalTrack[])
-					setStatusMessage('Media permission denied. Showing demo library')
-					return
-				}
+			const data = await AsyncStorage.getItem(DIRS_STORAGE_KEY)
+			const uris: string[] = data ? JSON.parse(data) : []
 
-				setStatusMessage('Scanning device audio library...')
-
-				let all: MediaLibrary.Asset[] = []
-				let after: string | undefined
-				let hasNextPage = true
-
-				while (hasNextPage) {
-					const page = await MediaLibrary.getAssetsAsync({
-						mediaType: [MediaLibrary.MediaType.audio],
-						first: AUDIO_PAGE_SIZE,
-						after,
-						sortBy: [MediaLibrary.SortBy.creationTime],
-					})
-
-					all = all.concat(page.assets)
-					hasNextPage = page.hasNextPage
-					after = page.endCursor ?? undefined
-				}
-
-				if (!active) return
-
-				const mapped: LocalTrack[] = all.map((asset) => ({
-					url: asset.uri,
-					title: filenameToTitle(asset.filename),
-					artist: 'Unknown Artist',
-					artwork: undefined,
-					rating: 0,
-					playlist: [],
-				}))
-
-				if (mapped.length === 0) {
-					setTracks(library as LocalTrack[])
-					setStatusMessage('No device songs found. Showing demo library.')
-				} else {
-					setTracks(mapped)
-					setStatusMessage(`Loaded ${mapped.length} songs from device.`)
-				}
-			} catch (error) {
-				if (!active) return
-				setTracks(library as LocalTrack[])
-				setStatusMessage(
-					`Could not read device media library. Showing demo library. (${error instanceof Error ? error.message : String(error)})`,
-				)
-			} finally {
-				if (active) setLoading(false)
+			if (uris.length === 0) {
+				setTracks([])
+				setStatusMessage('No folders added. Please add a folder.')
+				setLoading(false)
+				return
 			}
-		}
 
-		load()
-		return () => {
-			active = false
+			await scanDirectories(uris)
+		} catch (error) {
+			setStatusMessage(`Error loading saved folders: ${error}`)
+			setLoading(false)
 		}
+	}
+
+	const scanDirectories = async (uris: string[]) => {
+		try {
+			setLoading(true)
+			setTracks([])
+
+			const allAudioFiles: LocalTrack[] = []
+
+			for (const uri of uris) {
+				setStatusMessage(`Scanning ${decodeURIComponent(uri.split('%2F').pop() || uri)}...`)
+				const audioUris = await crawlDirectory(uri, 0)
+
+				for (const fileUri of audioUris) {
+					const filename = decodeURIComponent(fileUri.split('%2F').pop() || 'Unknown')
+					allAudioFiles.push({
+						url: fileUri,
+						title: filenameToTitle(filename),
+						artist: 'Unknown Artist',
+						artwork: undefined,
+						rating: 0,
+						playlist: [],
+					})
+				}
+			}
+
+			if (allAudioFiles.length === 0) {
+				setStatusMessage('No supported audio files found in selected folders.')
+			} else {
+				setStatusMessage(`Loaded ${allAudioFiles.length} songs.`)
+			}
+
+			setTracks(allAudioFiles)
+		} catch (error) {
+			setStatusMessage(`Error scanning folders ${error}`)
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	useEffect(() => {
+		loadDirectories()
 	}, [])
+
+	const addFolder = async () => {
+		try {
+			const permission = await StorageAccessFramework.requestDirectoryPermissionsAsync()
+			if (permission.granted) {
+				const data = await AsyncStorage.getItem(DIRS_STORAGE_KEY)
+				const uris: string[] = data ? JSON.parse(data) : []
+
+				if (!uris.includes(permission.directoryUri)) {
+					uris.push(permission.directoryUri)
+					await AsyncStorage.setItem(DIRS_STORAGE_KEY, JSON.stringify(uris))
+				}
+
+				await scanDirectories(uris)
+			}
+		} catch (error) {
+			console.error('Error adding folder', error)
+			setStatusMessage('Failed to add folder. Prolly permission denied?')
+		}
+	}
+
+	const cleanFolders = async () => {
+		try {
+			await AsyncStorage.removeItem(DIRS_STORAGE_KEY)
+			setTracks([])
+			setStatusMessage('all folders cleared. add folders to listen to songs')
+		} catch (e) {
+			console.error('error cleaning folders', e)
+		}
+	}
 
 	const filteredTracks = useMemo(() => {
 		if (!search) return tracks
@@ -107,5 +157,7 @@ export function useLocalTracks(search: string) {
 		loading,
 		statusMessage,
 		permissionDenied,
+		addFolder,
+		cleanFolders,
 	}
 }
