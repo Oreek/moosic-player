@@ -1,3 +1,4 @@
+import { mapWithConcurrency, readLocalAudioMetadata } from '@/helpers/audioMetadata'
 import { trackTitleFilter } from '@/helpers/filter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as FileSystem from 'expo-file-system/legacy'
@@ -36,7 +37,7 @@ export function useLocalTracks(search: string) {
 		try {
 			const files = await StorageAccessFramework.readDirectoryAsync(dirUri)
 			for (const fileUri of files) {
-				if (fileUri.match(/\.(mp3|flac|wav)$/i)) {
+				if (fileUri.match(/\.(mp3|flac|wav|m4a)$/i)) {
 					audioFiles.push(fileUri)
 				} else {
 					const info = await FileSystem.getInfoAsync(fileUri)
@@ -88,9 +89,10 @@ export function useLocalTracks(search: string) {
 
 				for (const fileUri of audioUris) {
 					const filename = decodeURIComponent(fileUri.split('%2F').pop() || 'Unknown')
+					const fallbackTitle = filenameToTitle(filename)
 					allAudioFiles.push({
 						url: fileUri,
-						title: filenameToTitle(filename),
+						title: fallbackTitle,
 						artist: 'Unknown Artist',
 						artwork: undefined,
 						rating: 0,
@@ -101,11 +103,28 @@ export function useLocalTracks(search: string) {
 
 			if (allAudioFiles.length === 0) {
 				setStatusMessage('No supported audio files found in selected folders.')
+				setTracks([])
 			} else {
-				setStatusMessage(`Loaded ${allAudioFiles.length} songs.`)
-			}
+				// setStatusMessage(`Loaded ${allAudioFiles.length} songs.`)
+				const total = allAudioFiles.length
+				setStatusMessage(`Reading song info (0/${total})...`)
 
-			setTracks(allAudioFiles)
+				const enriched = await mapWithConcurrency(allAudioFiles, 4, async (track, index) => {
+					if (index % 8 === 0 || index === total - 1) {
+						setStatusMessage(`Reading song info (${index + 1}/${total})...`)
+					}
+					const meta = await readLocalAudioMetadata(track.url, track.title)
+					return {
+						...track,
+						title: meta.title,
+						artist: meta.artist,
+						artwork: meta.artwork,
+					}
+				})
+
+				setStatusMessage(`loaded ${total} songs`)
+				setTracks(enriched)
+			}
 		} catch (error) {
 			setStatusMessage(`Error scanning folders ${error}`)
 		} finally {

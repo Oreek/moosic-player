@@ -51,12 +51,19 @@ type AudioPlayerContextValue = {
 
 const AudioPlayerContext = createContext<AudioPlayerContextValue | null>(null)
 
+function lockScreenArtworkUrl(artwork: string | undefined): string | undefined {
+	if (!artwork?.trim()) return undefined
+	const u = artwork.trim()
+	if (u.startsWith('data:')) return undefined
+	return u
+}
+
 function lockScreenMeta(track: AudioTrack): AudioMetadata {
 	return {
 		title: track.title,
 		artist: track.artist ?? 'Unknown artist',
 		albumTitle: 'Moosic Player',
-		artworkUrl: track.artwork,
+		artworkUrl: lockScreenArtworkUrl(track.artwork),
 	}
 }
 

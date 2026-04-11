@@ -35,11 +35,9 @@ export const TrackListItem = ({ track, isActive = false, onPress }: TrackListIte
 						{track.title}
 					</Text>
 
-					{track.artist && (
-						<Text numberOfLines={1} style={styles.trackArtistText}>
-							{track.artist}
-						</Text>
-					)}
+					<Text numberOfLines={1} style={styles.trackArtistText}>
+						{track.artist?.trim() || 'Unknown Artist'}
+					</Text>
 				</View>
 
 				<ChevronRight
