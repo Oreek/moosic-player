@@ -4,7 +4,7 @@ import { FavoriteProvider } from '@/context/FavoritesProvider'
 import { LibraryProvider } from '@/context/LibraryProvider'
 import { BlurTargetView, BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
-import { Book, CircleUser, Heart, Music } from 'lucide-react-native'
+import { CircleUser, Heart, Music, Settings } from 'lucide-react-native'
 import { useRef } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -77,7 +77,7 @@ const TabsNavigation = () => {
 							name="settings"
 							options={{
 								title: 'Settings',
-								tabBarIcon: ({ color }) => <Book size={20} color={color} />,
+								tabBarIcon: ({ color }) => <Settings size={20} color={color} />,
 							}}
 						/>
 					</Tabs>

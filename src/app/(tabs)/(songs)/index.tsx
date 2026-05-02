@@ -5,14 +5,7 @@ import { trackTitleFilter } from '@/helpers/filter'
 import { useNavSearch } from '@/hooks/useNavigationSearch'
 import { defaultStyle } from '@/styles'
 import { useMemo } from 'react'
-import {
-	ActivityIndicator,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 const SongScreen = () => {
 	const search = useNavSearch({
@@ -22,7 +15,7 @@ const SongScreen = () => {
 		},
 	})
 
-	const { tracks: libraryTracks, loading, statusMessage, addFolder, cleanFolders } = useLibrary()
+	const { tracks: libraryTracks, loading, statusMessage } = useLibrary()
 
 	const tracks = useMemo(() => {
 		if (!search) {
@@ -46,15 +39,6 @@ const SongScreen = () => {
 
 	return (
 		<View style={defaultStyle.container}>
-			<View style={styles.actionContainer}>
-				<TouchableOpacity style={[styles.button, styles.addButton]} onPress={addFolder}>
-					<Text style={styles.buttonText}>Add Folder</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={[styles.button, styles.clearButton]} onPress={cleanFolders}>
-					<Text style={styles.buttonText}>Clear Folders</Text>
-				</TouchableOpacity>
-			</View>
-
 			{loading ? (
 				<View style={{ padding: 16 }}>
 					<ActivityIndicator size="large" />
