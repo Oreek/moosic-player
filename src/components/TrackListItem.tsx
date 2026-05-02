@@ -1,16 +1,24 @@
 import { unknownTrackImgUrl } from '@/constants/images'
 import { colors, fontsize } from '@/constants/token'
 import { defaultStyle } from '@/styles'
-import { ChevronRight } from 'lucide-react-native'
-import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import { ChevronRight, Heart } from 'lucide-react-native'
+import { Image, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
 export type TrackListItenProps = {
 	track: { title: string; image?: string; artist?: string }
 	isActive?: boolean
 	onPress?: () => void
+	isFavorite?: boolean
+	onToggleFavorite?: () => void
 }
 
-export const TrackListItem = ({ track, isActive = false, onPress }: TrackListItenProps) => {
+export const TrackListItem = ({
+	track,
+	isActive = false,
+	onPress,
+	isFavorite = false,
+	onToggleFavorite,
+}: TrackListItenProps) => {
 	return (
 		<TouchableHighlight onPress={onPress} underlayColor={colors.background}>
 			<View style={styles.trackItemContainer}>
@@ -39,6 +47,21 @@ export const TrackListItem = ({ track, isActive = false, onPress }: TrackListIte
 						{track.artist?.trim() || 'Unknown Artist'}
 					</Text>
 				</View>
+
+				{onToggleFavorite ? (
+					<TouchableOpacity
+						onPress={onToggleFavorite}
+						hitSlop={12}
+						style={styles.favoriteButton}
+						accessibilityLabel={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+					>
+						<Heart
+							size={22}
+							color={isFavorite ? colors.primary : colors.textMuted}
+							fill={isFavorite ? colors.primary : 'transparent'}
+						/>
+					</TouchableOpacity>
+				) : null}
 
 				<ChevronRight
 					size={20}
@@ -77,5 +100,10 @@ const styles = StyleSheet.create({
 	},
 	textContainer: {
 		flex: 1,
+	},
+	favoriteButton: {
+		paddingHorizontal: 4,
+		paddingVertical: 8,
+		marginRight: 4,
 	},
 })

@@ -14,6 +14,14 @@ const ArtistScreenLayout = () => {
 						headerTitle: 'Artists',
 					}}
 				/>
+				<Stack.Screen
+					name="[artist]"
+					options={{
+						...StackScreenWithSearchBar,
+						headerTitle: '',
+						headerBackTitle: 'Artists',
+					}}
+				/>
 			</Stack>
 		</View>
 	)

@@ -1,8 +1,10 @@
 import { TracksList } from '@/components/TracksList'
 import { colors } from '@/constants/token'
-import { useLocalTracks } from '@/hooks/useLocalTracks'
+import { useLibrary } from '@/context/LibraryProvider'
+import { trackTitleFilter } from '@/helpers/filter'
 import { useNavSearch } from '@/hooks/useNavigationSearch'
 import { defaultStyle } from '@/styles'
+import { useMemo } from 'react'
 import {
 	ActivityIndicator,
 	ScrollView,
@@ -20,7 +22,14 @@ const SongScreen = () => {
 		},
 	})
 
-	const { tracks, loading, statusMessage, addFolder, cleanFolders } = useLocalTracks(search)
+	const { tracks: libraryTracks, loading, statusMessage, addFolder, cleanFolders } = useLibrary()
+
+	const tracks = useMemo(() => {
+		if (!search) {
+			return libraryTracks
+		}
+		return libraryTracks.filter(trackTitleFilter(search))
+	}, [search, libraryTracks])
 	// const filteredSongs = useMemo(() => {
 	// 	if (!search) return library
 
@@ -54,9 +63,11 @@ const SongScreen = () => {
 			) : (
 				<ScrollView contentInsetAdjustmentBehavior="automatic">
 					<View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
-						<Text style={{ textAlign: 'center', opacity: 0.6 }}>{statusMessage}</Text>
+						<Text style={[defaultStyle.text, { textAlign: 'center', opacity: 0.65 }]}>
+							{statusMessage}
+						</Text>
 					</View>
-					<TracksList tracks={tracks} scrollEnabled={false} />
+					<TracksList tracks={tracks} scrollEnabled={false} showFavoriteToggle />
 				</ScrollView>
 			)}
 		</View>
