@@ -1,54 +1,60 @@
 {
-  "expo": {
-    "name": "Moosic Player",
-    "slug": "moosic-player",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
-    "scheme": "moosic-player",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.moosicplayer"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.moosicplayer",
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-audio",
-        {
-          "microphonePermission": false,
-          "enableBackgroundPlayback": true,
-          "enableBackgroundRecording": false
-        }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "tsconfigPaths": true
-    }
-  }
+	"expo": {
+		"name": "Moosic Player",
+		"slug": "moosic-player",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon-fore.png",
+		"userInterfaceStyle": "dark",
+		"scheme": "moosic-player",
+		"splash": {
+			"image": "./assets/splash-icon.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#000000"
+		},
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.anonymous.moosicplayer"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"backgroundColor": "#000000",
+				"foregroundImage": "./assets/icon-fore.png",
+				"backgroundImage": "./assets/icon-back.png",
+				"monochromeImage": "./assets/icon.png"
+			},
+			"predictiveBackGestureEnabled": false,
+			"package": "com.oreek.mp",
+			"permissions": [
+				"android.permission.RECORD_AUDIO",
+				"android.permission.MODIFY_AUDIO_SETTINGS",
+				"android.permission.FOREGROUND_SERVICE",
+				"android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+			]
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-audio",
+				{
+					"microphonePermission": false,
+					"enableBackgroundPlayback": true,
+					"enableBackgroundRecording": false
+				}
+			]
+		],
+		"experiments": {
+			"typedRoutes": true,
+			"tsconfigPaths": true
+		},
+		"extra": {
+			"router": {},
+			"eas": {
+				"projectId": "f3526d15-21e4-4db3-9328-c827102742d1"
+			}
+		}
+	}
 }
