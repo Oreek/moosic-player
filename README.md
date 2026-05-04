@@ -1,6 +1,7 @@
-# Moosic Player
+<div align='center'>
 <img width="258" height="200" alt="app-logo" src="https://github.com/user-attachments/assets/8325f01d-cdb8-4150-81c4-7c0aacd996ec" />
-
+</div>
+# Moosic Player
 A basic local music player made in React Native ~while following the youtube tutorial [here](https://www.youtube.com/watch?v=9CElrkFwiBU)~ (The project began with the tutorial but things chnged and the project turned completely different from the tutorial in terms of code). ~I am going to complete building the tutorial while making my own changes and add a feature of my own at the end to truly make this project mine!~
 
 ## Features
